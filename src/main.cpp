@@ -100,28 +100,46 @@ int main() {
     }
 
     bool too_close = false;
+    bool can_change_lane_left = (lane != 0);
+    bool can_change_lane_right = (lane != 2);
 
     // find ref_v to use
     for (size_t i = 0; i < sensor_fusion.size(); ++i) {
       const double d = sensor_fusion[i][6];
-      // check whether car is in my lane or not.
-      if (2 + 4 * lane - 2 < d && d < 2 + 4 * lane + 2) {
+      if (d < 0)
+        continue;
+      const int check_car_lane = static_cast<int>(floor(d)) / 4;
+      if (check_car_lane == lane ||
+          (can_change_lane_left && check_car_lane == lane - 1) ||
+          (can_change_lane_right && check_car_lane == lane + 1)) {
+
         const double vx = sensor_fusion[i][3];
         const double vy = sensor_fusion[i][4];
         const auto check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
         const auto check_car_s = static_cast<double>(sensor_fusion[i][5]) +
                                  prev_size * 0.02 * check_speed;
-        if (car_s < check_car_s && check_car_s < car_s + 30) {
+        const auto distance_s = check_car_s - car_s;
+
+        if (check_car_lane == lane && 0 < distance_s && distance_s < 30) {
           too_close = true;
-          if (lane > 0) {
-            lane = 0;
-          }
+        } else if (check_car_lane == lane - 1 && -15 < distance_s &&
+                   distance_s < 30) {
+          can_change_lane_left = false;
+        } else if (check_car_lane == lane + 1 && -15 < distance_s &&
+                   distance_s < 30) {
+          can_change_lane_right = false;
         }
       }
     }
 
     if (too_close) {
-      ref_vel -= .224;
+      if (can_change_lane_left) {
+        lane--;
+      } else if (can_change_lane_right) {
+        lane++;
+      } else {
+        ref_vel -= .224;
+      }
     } else if (ref_vel < 49.5) {
       ref_vel += .224;
     }
