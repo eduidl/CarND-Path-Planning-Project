@@ -91,55 +91,26 @@ A really helpful resource for doing this project and creating smooth trajectorie
     cd uWebSockets
     git checkout e94b6e1
     ```
-
-## Editor Settings
-
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
-
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
 ## Project Instructions and Rubric
 
 Note: regardless of the changes you make, your project must be buildable using
 cmake and make!
 
+## Model
 
-## Call for IDE Profiles Pull Requests
+This path planning consists of 3 steps.
 
-Help your fellow students!
+### 1. Determine the action we should take roughly.
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
+`main.cpp#L106-145`
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+In my model, if there is vehicle in front of and near to me, first, check whether it is safe to change lanes (to the left or right).
+If it is safe, my car will change lanes, and if not, my car will slow down to avoid collision.
+If there is no vehicles in front of and near to my car, my car will not change lanes. In addition, if my car is slow my car will speed up.
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+### 2. Deterimine the waypoints.
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+`main.cpp#L151-223`
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Waypoints are calculated by using spline curve (`spline.h` is related header only library).
 
